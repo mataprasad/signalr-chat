@@ -1,0 +1,385 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <script src="~/Scripts/sr/jquery-1.8.2.js"></script>
+    <script src="~/Scripts/sr/jquery.signalR.js"></script>
+    <script src="~/Scripts/jquery.ui.widget.js"></script>
+    <script src="~/Scripts/jquery.iframe-transport.js"></script>
+    <script src="~/Scripts/jquery.fileupload.js"></script>
+    <script src="~/Scripts/jQuery.tmpl.js"></script>
+    <script src="~/Scripts/underscore.js"></script>
+    <script src="~/signalr/hubs"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" />
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script>
+
+        function fnLogOut(chatServer) {
+            chatServer.logOff(CHAT_GLOBALS_ME.ID);
+        }
+
+        function fnRemoveChatBox(obj) {
+            var chatBox = $(obj).parent().parent().parent();
+            $(chatBox).remove();
+        }
+
+        function fnMinizeChatWindow(obj) {
+            var chatBox = $(obj).parent().parent().parent();
+            if ($(chatBox).height() == "25") {
+                $(chatBox).css("height", $(chatBox).attr("data-old-height") + "px");
+            } else {
+                $(chatBox).attr("data-old-height", $(chatBox).height());
+                $(chatBox).css("height", "27px");
+            }
+        }
+
+        function fnSendMessage(id, chatServer) {
+            var textArea = $(".chatbox[data-id='" + id + "'] .chat-input");
+            if ($(textArea).val().trim() != "") {
+                var user = _.first(_.where(CHAT_GLOBALS_USER_LIST, { ID: id }));
+                //console.log("USER:", user);
+                var localMessage = '<p class="text-right message"><span class="me">You:</span> ' + $(textArea).val() + '</p>';
+                $(".chatbox[data-id='" + id + "'] .message-box").append(localMessage);
+                var chatMessage = {
+                    "ToConnectionId": user.ConnectionId, "FromConnectionId": CHAT_GLOBALS_ME.ConnectionId, "ToSessionId": user.SessionId, "FromSessionId": CHAT_GLOBALS_ME.SessionId,
+                    "ToUserAppPId": user.UserId, "FromUserAppPd": CHAT_GLOBALS_ME.UserId, "ToUserName": user.DisplayName, "FromUserName": CHAT_GLOBALS_ME.DisplayName,
+                    "ToChatId": user.ID, "FromChatId": CHAT_GLOBALS_ME.ID, "Message": $(textArea).val(), "Time": new Date(), "IsFile": false,
+                    "FileName": null, "FileUrl": null
+                }
+                //console.log("chatMessage:", chatMessage);
+                chatServer.sendMessage(chatMessage);
+                $(textArea).val("");
+            }
+        }
+
+        function fnHitSubmit(e, id) {
+            var code = e.keyCode ? e.keyCode : e.which;
+            if (code == 13) {  // Enter keycode
+                fnSendMessage(id, rndChat)
+                e.preventDefault();
+                return false;
+            }
+        }
+
+        function fnOpenChatBox(id, name) {
+            var chatBox_tmpl = $('#tmpl-rnd-chat-box').tmpl({ "chat_user_id": id, "chat_user_name": name });
+            var user = _.first(_.where(CHAT_GLOBALS_USER_LIST, { ID: id }));
+            if ($("#div-rnd-chat-conatianer").find("[data-id='" + id + "']").length == 0) {
+                //$("#div-rnd-chat-conatianer").find("[data-id='" + id + "']").remove();
+                $("#div-rnd-chat-conatianer").append(chatBox_tmpl);
+            }
+        }
+
+        function fnOpenFileBrowser() {
+            $("#fileupload").trigger("click");
+        }
+
+        var RndChat = function () {
+            var chatServer = null;
+
+            this.init = function (date_time, session_id, user_id, user_name, host, ip, recieve_message_callback, recieve_user_list_callback) {
+                if ($.connection != null) {
+                    jQuery.support.cors = true;
+                    $.connection.hub.url = 'signalr/hubs';
+                    chatServer = $.connection.RentNDealChat;
+
+                    $.connection.hub.start({ transport: 'auto' }, function () {
+                        var container_tmpl = $('#tmpl-rnd-chat-container').tmpl("");
+                        $("body").append(container_tmpl);
+                        chatServer.server.login(date_time, session_id, user_name, user_id, host, ip).fail(function (e) {
+                            console.log(e);
+                        });
+                    });
+
+                    chatServer.client.loginCallback = function (loginResponse) {
+                        CHAT_GLOBALS_ME = loginResponse;
+                    }
+
+                    chatServer.client.receiveMessage = function (message) {
+                        if (recieve_message_callback) {
+                            recieve_message_callback(message);
+                        }
+                    }
+
+                    chatServer.client.refreshUserList = function (user_list) {
+                        if (recieve_user_list_callback) {
+                            recieve_user_list_callback(user_list);
+                        }
+                    }
+                }
+            }
+
+            this.changeLoginStatus = function (status) {
+            }
+
+            this.sendMessage = function (message) {
+                chatServer.server.sendMessage(message);
+            }
+
+            this.sendFile = function () { }
+
+            this.downloadFile = function (file) { }
+
+            this.logOff = function (id) {
+                chatServer.server.logOff(id,"");
+                $.connection.hub.stop();
+                $("#div-rnd-chat-conatianer").remove();
+            }
+
+        }
+
+        var numRand = prompt("Enter your user name :", Math.floor(Math.random() * 1000));
+
+        $("title").text(numRand);
+
+        var CHAT_GLOBALS_USER_LIST = [];
+        var CHAT_GLOBALS_ME = {};
+
+        var rndChat = null;
+
+        $(document).ready(function () {
+            rndChat = new RndChat();
+            rndChat.init(new Date(), $("#SessionID").val(), numRand, numRand, $("#Host").val(), $("#Ip").val(), function (message) {
+                //console.log(message);
+                //called when message recieved
+                //$("body").append("MSG:" + JSON.stringify(message.Message));
+                //$("body").append("</br>");
+                fnOpenChatBox(message.FromChatId, message.FromUserName);
+                var localMessage = '<p class="text-left message"><span class="you">' + message.FromUserName + ':</span> ' + message.Message + '</p>';
+                $(".chatbox[data-id='" + message.FromChatId + "'] .message-box").append(localMessage);
+            }, function (user_list) {
+                CHAT_GLOBALS_USER_LIST = [];
+                CHAT_GLOBALS_USER_LIST = user_list;
+                // when user list recived
+                $("body div#users").html("<span style='color:red;'>USER LIST:" + JSON.stringify(CHAT_GLOBALS_USER_LIST) + "</span>");
+                $("#user-list div:eq(1)").empty();
+                $.each(user_list, function (i, obj) {
+                    if (CHAT_GLOBALS_ME.ID != obj.ID) {
+                        $("#user-list div:eq(1)").append('<a href="javascript:void(0)" onclick=\'fnOpenChatBox("' + obj.ID + '","' + obj.DisplayName + '")\' class="user">' + obj.DisplayName + '<span class="fa fa-x fa-circle pull-right login_status_' + obj.LoginStatus + '"></span></a>');
+                    }
+                });
+            });
+        });
+
+
+    </script>
+    <style type="text/css">
+        .hand-cursor {
+            cursor: pointer;
+        }
+
+        .users {
+            height: 500px;
+            width: 200px;
+            border: 1px solid black;
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            background-color:#FFF;
+        }
+
+        .header {
+            height: 20px;
+            background-color: #FE0032;
+            color: white;
+        }
+
+        .login_status_0 {
+            color: green;
+        }
+
+        .login_status_1 {
+            color: yellow;
+        }
+
+        .login_status_-1 {
+            color: red;
+        }
+
+        .available {
+            color: green;
+        }
+
+        .busy {
+            color: red;
+        }
+
+        .user {
+            border-bottom: 2px solid #eee;
+            border-top: 1px solid #eee text-decoration: none;
+            display: block;
+            padding: 5px;
+        }
+
+        .chatbox {
+            width: 300px;
+            height: 350px;
+            max-height: 350px;
+            border: 1px solid #333;
+            position: absolute;
+            bottom: 0;
+            background-color:#FFF;
+        }
+        .chatbox:last-child{
+            right: 200px;
+        }
+        .chatbox:nth-last-child(2){
+            right: 500px;
+        }
+        .chatbox:nth-last-child(3){
+            right: 800px;
+        }
+        .chatbox:nth-last-child(4){
+            right: 1100px;
+        }
+
+        .chatbox-header {
+            padding-top: 3px;
+            padding-bottom: 3px;
+            height: 25px;
+        }
+
+        .m-r-5 {
+            margin-right: 5px;
+        }
+
+        .message-box {
+            height: 250px;
+            border: 1px solid #333;
+            overflow-y: scroll;
+        }
+
+        .write-box {
+            height: 74px;
+            border: 1px solid #333;
+        }
+
+        .button-container {
+            width: 30px;
+            float: left;
+            border: 1px solid #333;
+            height: 100%;
+        }
+
+        .chat-input {
+            height: 100%;
+            width: 100%;
+        }
+
+        .input-container {
+            width: 265px;
+            height: 100%;
+            float: left;
+        }
+
+        .emoticon {
+            font-size: 28px;
+            cursor: pointer;
+            color: #FE0032;
+        }
+
+        .send {
+            font-size: 20px;
+            margin-top: 10px;
+            color: blue;
+        }
+
+        .message {
+            padding: 0 5px;
+            word-wrap:break-word;
+        }
+
+        .you {
+            color: red;
+        }
+
+        .me {
+            color: blue;
+        }
+    </style>
+    <script id="tmpl-rnd-chat-container" type="text/x-jquery-tmpl">
+        <div id="div-rnd-chat-conatianer">
+            <div id="user-list" class="users">
+                <div class="header">
+                    <span class="fa fa-x fa-close hand-cursor" onclick="fnLogOut(rndChat);"></span>Users</div>
+                <div></div>
+            </div>
+            <input id="fileupload" type="file" name="FileName" style="width: 0px;" />
+        </div>
+    </script>
+    <script id="tmpl-rnd-chat-box" type="text/x-jquery-tmpl">
+        <div class="chatbox" data-old-height="" data-id="${chat_user_id}">
+            <div class="header chatbox-header">
+                <span class="col-xs-4 "><span onclick="fnOpenFileBrowser()" class="fa fa-x fa-paperclip send-file hand-cursor"></span></span>
+                <span class="col-xs-4 "><span class="fa fa-x fa-map-marker m-r-5"></span>${chat_user_name}</span>
+                <span class="col-xs-4 text-right">
+                    <span class="fa fa-x fa-circle available m-r-5"></span>
+                    <span class="fa fa-x fa-minus m-r-5 hand-cursor" onclick="fnMinizeChatWindow(this);"></span>
+                    <span class="fa fa-x fa-close hand-cursor" onclick="fnRemoveChatBox(this);"></span>
+                </span>
+            </div>
+            <div class="message-box">
+            </div>
+            <form class="frm">
+                <div class="write-box">
+                    <div class="input-container">
+                        <textarea placeholder="Type your message here" class="chat-input" onkeypress="fnHitSubmit(event,'${chat_user_id}')"></textarea>
+                    </div>
+                    <div class="button-container">
+                        <span class="fa fa-x fa-smile-o emoticon hand-cursor"></span>
+                        <span class="fa fa-x fa-send-o send hand-cursor" onclick="fnSendMessage('${chat_user_id}',rndChat)"></span>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </form>
+        </div>
+    </script>
+</head>
+<body>
+    <input type="hidden" id="SessionID" value="@Session.SessionID" />
+    <input type="hidden" id="Host" value="rndchat.com" />
+    <input type="hidden" id="Ip" value="127.0.0.1" />
+    <div id="users"></div>
+    <script>
+        $(function () {
+            var url = "http://localhost:64467/home/upload";
+            $('#fileupload').fileupload({
+                url: url,
+                dataType: 'json',
+                add: function (e, data) {
+                    var max_File_Size = 2147483647;//2147483647;
+                    var uploadErrors = [];
+                    var acceptFileTypes = (/\.(gif|jpg|jpeg|tiff|png|zip|pdf)$/i);
+                    if (data.originalFiles[0]['name'].length && !acceptFileTypes.test(data.originalFiles[0]['name'])) {
+                        uploadErrors.push('Not an accepted file type');
+                    }
+                    if (data.originalFiles[0]['size'].toString().length && data.originalFiles[0]['size'] > max_File_Size) {
+                        uploadErrors.push('Filesize is too big');
+                    }
+                    if (uploadErrors.length > 0) {
+                        alert(uploadErrors.join("\n"));
+                    } else {
+                        data.submit();
+                    }
+                },
+                done: function (e, data) {
+                    $.each(data.result.files, function (index, file) {
+                        $('<p/>').text(file.name).appendTo('#files');
+                    });
+                }
+            });
+        });
+
+    </script>
+    @Json.Encode(new RentNDeal.Chat.Server.Entity.ClientMessage())
+</body>
+</html>

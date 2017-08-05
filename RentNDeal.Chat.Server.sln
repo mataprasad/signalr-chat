@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Express 2012 for Web
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RentNDeal.Chat.Server.Web", "RentNDeal.Chat.Server.Web\RentNDeal.Chat.Server.Web.csproj", "{6C5E0D99-40BE-4F9B-8035-2D049EF53C59}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RentNDeal.Chat.Server.Util", "RentNDeal.Chat.Server.Util\RentNDeal.Chat.Server.Util.csproj", "{52568E68-362A-4E68-997A-C31FCB6F0F82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RentNDeal.Chat.Server.Db", "RentNDeal.Chat.Server.Db\RentNDeal.Chat.Server.Db.csproj", "{260A0069-2C20-4E55-A05F-4BB409DDCF3E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RentNDeal.Chat.Server.Entity", "RentNDeal.Chat.Server.Entity\RentNDeal.Chat.Server.Entity.csproj", "{68A85928-FC85-482E-ACED-D196B79A4A82}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 5
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://saranshmehra.visualstudio.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = RentNDeal.Chat.Server.Db\\RentNDeal.Chat.Server.Db.csproj
+		SccProjectName1 = RentNDeal.Chat.Server.Db
+		SccLocalPath1 = RentNDeal.Chat.Server.Db
+		SccProjectUniqueName2 = RentNDeal.Chat.Server.Entity\\RentNDeal.Chat.Server.Entity.csproj
+		SccProjectName2 = RentNDeal.Chat.Server.Entity
+		SccLocalPath2 = RentNDeal.Chat.Server.Entity
+		SccProjectUniqueName3 = RentNDeal.Chat.Server.Util\\RentNDeal.Chat.Server.Util.csproj
+		SccProjectName3 = RentNDeal.Chat.Server.Util
+		SccLocalPath3 = RentNDeal.Chat.Server.Util
+		SccProjectUniqueName4 = RentNDeal.Chat.Server.Web\\RentNDeal.Chat.Server.Web.csproj
+		SccProjectName4 = RentNDeal.Chat.Server.Web
+		SccLocalPath4 = RentNDeal.Chat.Server.Web
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6C5E0D99-40BE-4F9B-8035-2D049EF53C59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C5E0D99-40BE-4F9B-8035-2D049EF53C59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C5E0D99-40BE-4F9B-8035-2D049EF53C59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C5E0D99-40BE-4F9B-8035-2D049EF53C59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52568E68-362A-4E68-997A-C31FCB6F0F82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52568E68-362A-4E68-997A-C31FCB6F0F82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52568E68-362A-4E68-997A-C31FCB6F0F82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52568E68-362A-4E68-997A-C31FCB6F0F82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{260A0069-2C20-4E55-A05F-4BB409DDCF3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{260A0069-2C20-4E55-A05F-4BB409DDCF3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{260A0069-2C20-4E55-A05F-4BB409DDCF3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{260A0069-2C20-4E55-A05F-4BB409DDCF3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68A85928-FC85-482E-ACED-D196B79A4A82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68A85928-FC85-482E-ACED-D196B79A4A82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68A85928-FC85-482E-ACED-D196B79A4A82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68A85928-FC85-482E-ACED-D196B79A4A82}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

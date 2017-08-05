@@ -1,0 +1,4 @@
+D:\Mata\Saransh\CHAT\ChatServer\RentNDeal.Chat.Server.Entity\bin\Debug\RentNDeal.Chat.Server.Entity.dll
+D:\Mata\Saransh\CHAT\ChatServer\RentNDeal.Chat.Server.Entity\bin\Debug\RentNDeal.Chat.Server.Entity.pdb
+D:\Mata\Saransh\CHAT\ChatServer\RentNDeal.Chat.Server.Entity\obj\Debug\RentNDeal.Chat.Server.Entity.dll
+D:\Mata\Saransh\CHAT\ChatServer\RentNDeal.Chat.Server.Entity\obj\Debug\RentNDeal.Chat.Server.Entity.pdb
